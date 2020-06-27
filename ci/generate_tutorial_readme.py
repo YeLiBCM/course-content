@@ -5,13 +5,11 @@ from glob import glob
 def main():
 
     readme_text = [
-        "# Tutorials",
+        "# Neuromatch Academy Tutorial Notebooks",
         "",
-        "Tutorial notebooks are stored here, organized by each day."
-        ""
     ]
 
-    day_paths = sorted(glob("tutorials/W?W?_*"))
+    day_paths = sorted(glob("tutorials/W?D?_*"))
     for day_path in day_paths:
 
         day_name = os.path.split(day_path)[-1]
@@ -25,20 +23,19 @@ def main():
                 topic_words[-1] += letter
         topic = " ".join(topic_words)
 
-        readme_text.extend([
-            f"## {day_code} - {topic}"
-            ""
-        ])
+        # Note: this will fail if we have 10 notebooks
+        notebooks = sorted(glob(f"{day_path}/*.ipynb"))
 
-        readme_text.extend({
-            "### Tutorial notebooks"
+        if not notebooks:
+            continue
+
+        readme_text.extend([
+            f"## {day_code} - {topic}",
             "",
             "|   | Student version | Instructor version |",
             "| - | --------------- | ------------------ |",
-        })
+        ])
 
-        # Note: this will fail if we have 10 notebooks
-        notebooks = sorted(glob(f"{day_path}/*.ipynb"))
         for i, instructor_nb in enumerate(notebooks, 1):
             _, nb_fname = os.path.split(instructor_nb)
             student_nb = f"{day_path}/student/{nb_fname}"
@@ -46,9 +43,9 @@ def main():
             student_badge = make_colab_badge(student_nb)
             instructor_badge = make_colab_badge(instructor_nb)
 
-            readme_text.extend([
+            readme_text.append(
                 f"| Tutorial {i} | {student_badge} | {instructor_badge} |"
-            ])
+            )
 
         readme_text.append("\n")
 
